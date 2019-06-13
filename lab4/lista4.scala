@@ -79,11 +79,8 @@ object Zad2 extends App {
     var resultA: Option[A] = None
     var resultB: Option[B] = None
 
-    def evalA(): Unit = { resultA = Some(block1) }
-    def evalB(): Unit = { resultB = Some(block2) }
-
-    val p = new Thread(() => evalA())
-    val q = new Thread(() => evalB())
+    val p = new Thread(() => { resultA = Some(block1) })
+    val q = new Thread(() => { resultB = Some(block2) })
 
     p.start(); q.start(); p.join(); q.join()
 
@@ -92,9 +89,9 @@ object Zad2 extends App {
   }
 
   println(parallel(
-    { for (i <- 1 to 20) println(s"1: $i")
+    { for (i <- 1 to 100) println(s"1: $i")
       "a" + 1 },
-    { for (i <- 1 to 20) println(s"2: $i")
+    { for (i <- 1 to 100) println(s"2: $i")
       "b" + 2 }))
 
   println(parallel(Thread.currentThread.getName, Thread.currentThread.getName))
@@ -103,12 +100,7 @@ object Zad2 extends App {
 
 object Zad3 extends App {
   def periodically(duration: Long, times: Int)(block: => Unit): Unit = {
-    def perform(): Unit = {
-      var t = times
-      while (t > 0) { block; Thread.sleep(duration); t -= 1 }
-    }
-
-    val p = new Thread(() => perform())
+    val p = new Thread(() => for (_ <- 1 to times) { block; Thread.sleep(duration) })
     p.setDaemon(true)
     p.start()
   }
